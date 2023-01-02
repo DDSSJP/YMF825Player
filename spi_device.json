@@ -1,0 +1,19 @@
+{
+    "output datetime": "2023-01-02 23:37:53.300174",
+    "use_id": "FTPVNW8R",
+    "device_list": [
+        {
+            "device": "FTD2xx",
+            "id": "FTPVNW8R",
+            "detail": {
+                "flag": 2,
+                "type": 8,
+                "id": 67330068,
+                "locaton": 790,
+                "serial number": "FTPVNW8R",
+                "description": "FT232H",
+                "handle": null
+            }
+        }
+    ]
+}
