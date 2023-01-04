@@ -1,4 +1,5 @@
 import time
+from YMF825_chip import *
 
 def sleep_ms(ms):
     time.sleep(ms / 1000.0)
@@ -15,6 +16,36 @@ class YMF825Player:
         self._spi = None
         self._song = None
         self._status = YMF825Player.STATUS_STOP
+        self._reg = YMF825Register()
+        self._reg._reg[0] = 0b0000_0000 # CLKE
+        self._reg._reg[1] = 0b0000_0000 # ALRST
+        self._reg._reg[2] = 0b0000_0000 # AP3,AP2,AP1,AP0
+        self._reg._reg[80] = 0xa5 # COMM
+
+        # p = YMF825Parameter
+        # reg2 = YMF825Register()
+        # YMF825Register.copy(reg2, self._reg)
+        # write_parameter_to_register(reg2, p.CRGD_VNO, 1)
+        # write_parameter_to_register(reg2, p.VoVol, 11)
+        # write_parameter_to_register(reg2, p.CRGD_VNO, 2)
+        # write_parameter_to_register(reg2, p.VoVol, 12)
+        # write_parameter_to_register(reg2, p.CRGD_VNO, 3)
+        # write_parameter_to_register(reg2, p.VoVol, 13)
+        # write_parameter_to_register(reg2, p.CRGD_VNO, 4)
+        # write_parameter_to_register(reg2, p.VoVol, 14)
+        # write_parameter_to_register(reg2, p.SIZE, 10)
+        # write_parameter_to_register(reg2, p.ContentsDataWrite, 1)
+        # write_parameter_to_register(reg2, p.ContentsDataWrite, 0)
+        # write_parameter_to_register(reg2, p.ContentsDataWrite, 3)
+        # write_parameter_to_register(reg2, p.ContentsDataWrite, 0)
+        # write_parameter_to_register(reg2, p.ContentsDataWrite, 0)
+        # write_parameter_to_register(reg2, p.ContentsDataWrite, 2)
+        # write_parameter_to_register(reg2, p.ALRST, 1)
+        # reg, ctrl, fifo = YMF825Register.diff(reg2, self._reg)
+        # print(reg)
+        # print(ctrl)
+        # print(fifo)
+        # exit()
 
     @property
     def status(self):
@@ -103,6 +134,11 @@ class YMF825Player:
         if ret[0] != 0xA5:
             raise Exception("failed to software communication check.")
 
+        # check HardwareID
+        ret = self._spi.read_single(4)
+        if ret[0] != 0b0000_0001:
+            raise Exception("not target hardware. ->", ret)
+
         # 4. Set DRV_SEL to "0" when this device is used in single 5-V power supply configuration. Set DRV_SEL to "1" when this device is used in dual power supply configuration.
         self._spi.write_single(29, 0b0000_0000) # output power: used in single 5-V power
         # 5. Set the AP0 to "0". The VREF is powered.
@@ -127,7 +163,7 @@ class YMF825Player:
         self._spi.write_single( 2, 0b0000_0000) # analog powered: AP3,AP2,AP1,AP0 (DAC,SP2,SP1,VREF)
 
     def _write_tone(self, tone_list):
-        num = len(tone_list) + 1
+        num = len(tone_list) - 1
         data = [0x80 + num]
         for i in range(len(tone_list)):
             data.extend(tone_list[i])
@@ -136,3 +172,23 @@ class YMF825Player:
 
     def _write_eq(self, qe_data):
         pass
+
+    def _print_control_register(self):
+        ctrl = []
+        for i in range(256):
+            self._spi.write_single(21, i)
+            ctrl.append(self._spi.read_single(22))
+        for i in range(16):
+            for k in range(16):
+                print(f"{ctrl[i*16+k][0]:02x} ",end="")
+            print()
+    
+    def _print_register(self):
+        reg = []
+        for i in range(80):
+            reg.append(self._spi.read_single(i))
+        for i in range(8):
+            for k in range(10):
+                print(f"{reg[i*10+k][0]:02x} ",end="")
+            print()
+

@@ -225,7 +225,7 @@ class DeviceFTD2xx(DeviceBase):
         FTD2xx.FT_Write(self._handle, bytes([0x80, self.pin_rstn_high, self.pin_direction]))
 
     def write_burst(self, adr, data):
-        length = len(data) + 1 - 1
+        length = 1 + len(data) - 1
         buf = [0x11, length%256, length//256, adr]
         buf.extend(data)
         buf = bytes(buf)

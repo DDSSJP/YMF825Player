@@ -2,21 +2,29 @@ class Tone():
     pass
 
 class Command():
-    NONE = 0
-    REST = 1
-    TONE = 2
-    VOLUME = 3
-    NOTE = 4
-    MODULATION = 5
+    NONE = "none"
+    Rest = "rest"
+    KeyOn = "key_on"
+    KeyOff = "key_off"
+    Note = "note"
+    Tone = "tone"
+    Volume = "volume"
+    Detune = "detune"
+    Quantize = "quantize"
+    Vibrato = "vibrato"
+    Modulation = "modulation"
+    Envelope = "envelope"
     def __init__(self, cmd):
         pass
 
 class PartData:
     def __init__(self, no):
         self.no = no
+        self.ch = 0
         self.volume = 0
         self.tone = 0
         self.note = 0
+        self.keyon = 0
         self._data = []
         self._index = 0
         self._tick = 0 # cmd内のtick
@@ -35,10 +43,10 @@ class PartData:
 
 class SongData():
     def __init__(self):
-        self.title = "None"
-        self.composer = "None"
-        self.arranger = "None"
-        self.message = "None"
+        self.title = ""
+        self.composer = ""
+        self.arranger = ""
+        self.message = ""
         self.part_data = [PartData(i) for i in range(16)]
         self.master_volume = 0
 
